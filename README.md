@@ -9,15 +9,12 @@ For an example of how to use this framework, see my [Attention-driven Robot Mani
 
 This project is mostly intended for my personal use (Stephen James) and facilitate my research.
 
-## Modifcations
+## Modifications
 
-This is my (Mohit Shridhar) fork of YARR. Honestly, I don't understand what exactly is happening in a lot of places, so there a lot of hacks to make it work for my purposes. If you are doing simple behavior cloning, you can probably write simpler training and evaluation routines, but YARR might be useful if you also want to do RL. Here is a quick summary of my modifcations:
+This is my (Ozan Özdemir) fork of YARR for XBiT based on Mohit Shridhar's fork. Here are my modifcations:
 
-- Switched from randomly sampling evaluation episodes to deterministic reloading of val/test dataset episodes for one-to-one comparisons across models.
-- Separated training and evaluation routines. 
-- Task-uniform replay buffer for multi-task training. Each batch has a uniform distribution of tasks. 
-- Added cinematic recorder for rollouts.
-- Some other weird hacks to prevent memory leaks.
+- _independent_env_runner.py: Made it compatible for RL fine-tuning with different RL algorithms such as REINFORCE, DDPG and PPO
+- rollout_generator.py: Made it compatible for RL fine-tuning with different RL algorithms such as REINFORCE, DDPG and PPO
 
 ## Install
 
