@@ -245,8 +245,8 @@ class _IndependentEnvRunner(_EnvRunner):
                                             #advantages[i+j] = (advantages[i+j]-advantages[i+j].mean())/(advantages[i+j].std()+1e-8)
                                         hid = self._agent.initialise_hidden(init_observations[i+j],
                                                                                     torch.Tensor(init_behaviors[i+j]).unsqueeze(
-                                                                                        0).unsqueeze(0).to('cuda'), instructions[i+j], True)
-                                        _, log_prob, baseline_pred = self._agent.act_with_exploration(observations[i+j], hid,poses[i+j], True, True, rl_alg)
+                                                                                        0).unsqueeze(0).to('cuda'), instructions[i+j])
+                                        _, log_prob, baseline_pred = self._agent.act_with_exploration(observations[i+j], hid,poses[i+j], True, rl_alg)
                                         log_probs.append(log_prob)
                                         baseline_preds.append(baseline_pred)
                                     baseline_loss=self._agent.update_with_ppo(log_probs, log_probs_old[i:i+mini_batch_size], returns[i:i+mini_batch_size],
@@ -258,11 +258,10 @@ class _IndependentEnvRunner(_EnvRunner):
                                         hid = self._agent.initialise_hidden(init_observations[i+j],
                                                                             torch.Tensor(init_behaviors[i+j]).unsqueeze(
                                                                                 0).unsqueeze(0).to('cuda'),
-                                                                            instructions[i+j], True)
+                                                                            instructions[i+j])
                                         _, log_prob, baseline_pred = self._agent.act_with_exploration(observations[i+j],
                                                                                                       hid,
-                                                                                                      poses[i+j], True,
-                                                                                                      True, rl_alg)
+                                                                                                      poses[i+j], True, rl_alg)
                                         log_probs.append(log_prob)
                                         baseline_preds.append(baseline_pred)
                                     baseline_loss = self._agent.update_with_ppo(log_probs, log_probs_old[i:i + len(log_probs_old) % mini_batch_size],
@@ -383,11 +382,11 @@ class _IndependentEnvRunner(_EnvRunner):
                                                                           np.stack(init_observations_wrgb),
                                                                           torch.from_numpy(np.stack(init_behaviors,
                                                                                                     axis=0)).unsqueeze(
-                                                                              1).to('cuda'), lang_goals, True)
+                                                                              1).to('cuda'), lang_goals)
                                 policy_grads, critic_outs = self._agent.calculate_pol_grads_and_q_values(
                                     torch.cat(actions), torch.cat(observations_frgb),
                                     torch.cat(observations_rsrgb), torch.cat(observations_lsrgb),
-                                    torch.cat(observations_wrgb), hids, torch.cat(behaviors), True)
+                                    torch.cat(observations_wrgb), hids, torch.cat(behaviors))
                                 baseline_loss = self._agent.update_with_ddpg(policy_grads, rws, critic_outs,
                                                                              critic_target_outs)
                                 writer.add_scalar(eval_demo_seed, 'baseline loss', baseline_loss)

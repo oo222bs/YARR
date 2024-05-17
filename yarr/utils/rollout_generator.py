@@ -45,12 +45,12 @@ class RolloutGenerator(object):
                 obs_s['wrist_depth'][0], scale_factor=2 ** 24 - 1).convert('L')
         if rl_alg == 'PPO':
             with torch.no_grad():
-                hid = agent_old.initialise_hidden(obs_s, torch.Tensor(init_behavior).unsqueeze(0).unsqueeze(0).to('cuda'), env._lang_goal, True)
+                hid = agent_old.initialise_hidden(obs_s, torch.Tensor(init_behavior).unsqueeze(0).unsqueeze(0).to('cuda'), env._lang_goal)
         elif rl_alg == 'DDPG':
             with torch.no_grad():
-                hid = agent.initialise_hidden(obs_s, torch.Tensor(init_behavior).unsqueeze(0).unsqueeze(0).to('cuda'), env._lang_goal, True)
+                hid = agent.initialise_hidden(obs_s, torch.Tensor(init_behavior).unsqueeze(0).unsqueeze(0).to('cuda'), env._lang_goal)
         else:
-            hid = agent.initialise_hidden(obs_s, torch.Tensor(init_behavior).unsqueeze(0).unsqueeze(0).to('cuda'), env._lang_goal, True)
+            hid = agent.initialise_hidden(obs_s, torch.Tensor(init_behavior).unsqueeze(0).unsqueeze(0).to('cuda'), env._lang_goal)
         if depth:
             obs_s['wrist_depth'] = obs_s_w_depth_copy
         obs_history = {k: [np.array(v, dtype=self._get_type(v))] * timesteps for k, v in obs_s.items()}
@@ -79,7 +79,7 @@ class RolloutGenerator(object):
                         obs_rsrgb = prepped_data['right_shoulder_rgb']
                         obs_wrgb = prepped_data['wrist_rgb']
                         with torch.no_grad():
-                            act_result_joints = agent.get_action_ddpg(prepped_data, hid, beh_history[step], True)
+                            act_result_joints = agent.get_action_ddpg(prepped_data, hid, beh_history[step])
                     elif rl_alg=='PPO':
                         observation_for_agent = prepped_data
                         with torch.no_grad():
@@ -88,7 +88,7 @@ class RolloutGenerator(object):
                             baseline_preds_old.append(baseline_out_old)
                     elif rl_alg=='CACLA':
                         if step>0:
-                            hid = agent.initialise_hidden(obs_s,torch.Tensor(init_behavior).unsqueeze(0).unsqueeze(0).to('cuda'), env._lang_goal, True)
+                            hid = agent.initialise_hidden(obs_s,torch.Tensor(init_behavior).unsqueeze(0).unsqueeze(0).to('cuda'), env._lang_goal)
                         act_result_joints, actor_out, baseline_inp = agent.act_with_exploration(prepped_data, hid, beh_history[step], True, with_baseline, rl_alg, eval_demo_seed)
                     else:
                         act_result_joints, log_prob, baseline_out = agent.act_with_exploration(prepped_data, hid, beh_history[step], True, with_baseline, rl_alg, eval_demo_seed)
@@ -98,7 +98,7 @@ class RolloutGenerator(object):
                     act_result_joints, log_prob = agent.act_with_exploration(prepped_data, hid, beh_history[step], True, with_baseline, rl_alg, eval_demo_seed)
                     log_probs.append(log_prob)
             else:
-                act_result_joints = agent.act(prepped_data, hid, beh_history[step], True)
+                act_result_joints = agent.act(prepped_data, hid, beh_history[step])
 
             act_result = ActResult(act_result_joints.squeeze().detach().cpu())
             if type(init_arm_pose)==list and step==0 and eval_demo_seed<1000:
